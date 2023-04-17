@@ -1,11 +1,11 @@
 
-class DistinctSet<_Tp> implements Set<_Tp>{
+class DistinctSet<_Tp, _CheckTp> implements Set<_Tp>{
 
     container : Array<_Tp>
-    filtering : (_Tp) => boolean
+    mapping : (_Tp) => _CheckTp
 
-    constructor( filtering : (_Tp) => boolean, container : Array<_Tp> = Array<_Tp>() ) {
-        this.filtering = filtering
+    constructor( mapping : (_Tp) => _CheckTp, container : Array<_Tp> = Array<_Tp>() ) {
+        this.mapping = mapping
         this.container = container
     }
 
@@ -17,7 +17,7 @@ class DistinctSet<_Tp> implements Set<_Tp>{
     }
 
     add(value: _Tp): this {
-        if( !this.container.find( item => this.filtering(item) ) ) {
+        if( !this.has(value) ) {
             this.container.push(value)
         }
         return this;
@@ -27,8 +27,15 @@ class DistinctSet<_Tp> implements Set<_Tp>{
         this.container = new Array<_Tp>()
     }
 
+    update(value: _Tp) : this {
+        if(this.delete(value)) {
+            this.container.push(value)
+        }
+        return this;
+    }
+
     delete(value: _Tp): boolean {
-        const idx = this.container.findIndex( item => this.filtering(item) )
+        const idx = this.container.findIndex( item => this.isSame(item, value) )
         if(idx >= 0) {
             this.container.splice(idx, 1)
             return true;
@@ -44,7 +51,10 @@ class DistinctSet<_Tp> implements Set<_Tp>{
     }
 
     has(value: _Tp): boolean {
-        return this.container.has(value);
+        if(this.container.find( item => this.isSame(item, value) ))
+            return true;
+        else
+            return false;
     }
 
     keys(): IterableIterator<_Tp> {
@@ -56,4 +66,7 @@ class DistinctSet<_Tp> implements Set<_Tp>{
     }
 
 
+    private isSame(lhs : _Tp, rhs : _Tp) {
+        return JSON.stringify(this.mapping(lhs)) == JSON.stringify(this.mapping(rhs))
+    }
 }
