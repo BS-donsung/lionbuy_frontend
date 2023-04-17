@@ -56,6 +56,7 @@ export const useAuthService =
                 currentAccount.credential = "success1234"
                 currentAccount.isAuthentication = true
             }
+
             return asyncService.asyncProcessing(URI_OF_REGISTER, loginProcessing)
         }
         async function update( account : AccountInfo, password : string ) : Promise<boolean> {

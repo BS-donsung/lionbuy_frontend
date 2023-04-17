@@ -6,7 +6,6 @@ import {
     URI_OF_ACCOUNT_SELECT,
     URI_OF_ACCOUNT_UPDATE
 } from "../requestinfo/AccountServiceInfo";
-import {ProcessStatus} from "../enums/ProcessStatus";
 import {AsyncProcessService} from "./AsyncProcessService";
 
 
@@ -15,16 +14,20 @@ const AccountService =
 
         const asyncService = new AsyncProcessService();
         // cashed data
-        const purchasedItemList : Array<PurchasedItemDTO> = []
+        const distinctFilter = (value : PurchasedItemDTO) => { return true; }
+        const purchasedItemList : DistinctSet<PurchasedItemDetailDTO> = new DistinctSet( )
 
-        function findByMonth( month : number, year : number ) : Array<PurchasedItemDTO>{
-
+        function selectByMonth( month : number, year : number ) : Array<PurchasedItemDTO>{
             return this.perchasedList.filter( item => {
                 return item.dateOfPurchase.getMonth() && item.dateOfPurchase.getUTCFullYear()
             })
         }
+        function selectPriceByMonth( month : number, year : number ) : number {
+            return this.selectByMonth(month, year).map( item => item.price ).reduce()
+        }
         async function getPurchasedItemList() {
-            return asyncService.asyncOutputProcessing(URI_OF_ACCOUNT_SELECT, () => {
+            return asyncService.asyncOutputProcessing(URI_OF_ACCOUNT_SELECT, ( data : Array<PurchasedItemDetailDTO>) => {
+                data
                 // get Data processing & store
                 // mocking
                 // this.purchasedList.add(data["data"]);

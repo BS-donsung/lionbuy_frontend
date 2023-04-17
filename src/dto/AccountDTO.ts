@@ -7,7 +7,7 @@ export class PurchasedItemDTO {
 export class PurchasedItemDetailDTO implements PurchasedItemDTO {
     product: string;
     dateOfPurchase: Date;
-    purchasedPrice : number;
+    price : number;
     //
 }
 
