@@ -1,7 +1,7 @@
 import {defineStore} from "pinia"
 import {ProcessStatus, STATUS} from "../enums/ProcessStatus";
 import { URI_OF_DEACTIVATE, URI_OF_LOGIN, URI_OF_REGISTER, URI_OF_UPDATE} from "../requestinfo/AuthRequestInfo"
-import {AsyncProcessService} from "./AsyncProcessService";
+import {AsyncProcessService} from "../abstract/AsyncProcessService";
 import {AuthDTO, CreateUserDTO} from "../dto/AuthDTO";
 import {RequestInfo} from "../requestinfo";
 

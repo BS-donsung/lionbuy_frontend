@@ -1,49 +1,43 @@
 import {defineStore} from "pinia";
-import {PurchasedItemDetailDTO, PurchasedItemDTO} from "../dto/AccountDTO";
+import {CachedListContainer} from "../abstract/CachedListContainer";
+import {WishItemDTO} from "../dto/ProductDTO";
 import {
-    URI_OF_ACCOUNT_ADD,
-    URI_OF_ACCOUNT_DELETE,
-    URI_OF_ACCOUNT_SELECT,
-    URI_OF_ACCOUNT_UPDATE
-} from "../requestinfo/AccountServiceInfo";
+    URI_OF_WISH_ADD,
+    URI_OF_WISH_DELETE,
+    URI_OF_WISH_SELECT,
+    URI_OF_WISH_UPDATE
+} from "../requestinfo/WishListServiceInfo";
 
-const useWishListStore =
+const useWishListService =
     defineStore("wishlist", () => {
-        // const wishListItem : Array<PurchasedItemDTO> = []
-        //
-        // function findByMonth( month : number, year : number ) : Array<PurchasedItemDTO>{
-        //     return this.wishListItem.filter( item => {
-        //         return item.dateOfPurchase.getMonth() && item.dateOfPurchase.getUTCFullYear()
-        //     })
-        // }
-        //
-        // function getTotalPaymentCost( month : number, year : number) : number {
-        //     return this.findByMonth(month, year).map( item => item.price ).reduce()
-        // }
-        //
-        // async function getPurchasedItemList() {
-        //     return asyncService.asyncOutputProcessing(URI_OF_ACCOUNT_SELECT, () => {
-        //         // get Data processing & store
-        //         // mocking
-        //         // this.purchasedList.add(data["data"]);
-        //         // 현재 데이터와 중복된 데이터를 제외하고 어떤 데이터를 얻었는지? 아니면 뒤에 쿼리 문을 작성
-        //     })
-        // }
-        //
-        // async function addPurchasedItem( purchaseditem : PurchasedItemDetailDTO ) {
-        //     return asyncService.asyncInputProcessing(URI_OF_ACCOUNT_ADD, purchaseditem)
-        // }
-        //
-        // async function updatePurchasedItem( purchaseditem : PurchasedItemDetailDTO ){
-        //     return asyncService.asyncProcessing(URI_OF_ACCOUNT_UPDATE, purchaseditem, () => {
-        //
-        //     })
-        // }
-        //
-        // async function deletePurchasedItem( purchaseditem : PurchasedItemDTO ) : Promise<boolean> {
-        //     return asyncService.asyncProcessing(URI_OF_ACCOUNT_DELETE, purchaseditem)
-        // }
-        //
-        // return { perchasedList, findByMonth,
-        //     getPurchasedItemList, addPurchasedItem, updatePurchasedItem, deletePurchasedItem }
+        const distinctBase = (item : WishItemDTO ) => item.product
+        const cacheContainer = new CachedListContainer<WishItemDTO>(distinctBase)
+
+        function selectWishList() : Array<WishItemDTO> {
+            return cacheContainer.getDataList()
+        }
+        function selectWishListTotalPrice() : number {
+            return cacheContainer.getDataList().map( item => item.lowerprice ).reduce( acc, curr => acc + curr, 0)
+        }
+
+        async function updateCache( month : number, year : number ) : Promise<boolean> {
+            await cacheContainer.updateCache(URI_OF_WISH_SELECT)
+        }
+
+        function addWishItem( wishItemDTO : WishItemDTO ) : Promise<boolean> {
+            return cacheContainer.add(URI_OF_WISH_ADD, wishItemDTO)
+        }
+        function updatePurchasedItem( wishItemDTO : WishItemDTO ) : Promise<boolean> {
+            return cacheContainer.add(URI_OF_WISH_UPDATE, wishItemDTO)
+        }
+        function deletePurchasedItem( wishItemDTO : WishItemDTO ) : Promise<boolean> {
+            return cacheContainer.add(URI_OF_WISH_DELETE, wishItemDTO)
+        }
+
+        return {
+            selectWishList, selectWishListTotalPrice,
+            updateCache,
+            addWishItem, updatePurchasedItem, deletePurchasedItem
+
+        }
     })

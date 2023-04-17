@@ -10,4 +10,3 @@ export class PurchasedItemDetailDTO implements PurchasedItemDTO {
     price : number;
     //
 }
-

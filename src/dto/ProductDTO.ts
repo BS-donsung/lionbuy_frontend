@@ -19,3 +19,10 @@ export class LowerPriceByMall implements LowerPrice {
     mall : string
 }
 
+export class WishItemDTO {
+    product :  string
+    lowerprice : number
+    image_url : string
+    priority : number
+    choice_date  : Date
+}

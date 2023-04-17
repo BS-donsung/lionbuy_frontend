@@ -1,6 +1,6 @@
 import {ProcessStatus} from "../enums/ProcessStatus";
 import {HTTP_METHOD, RequestInfo} from "../requestinfo"
-import { Optional } from "typescript-optional"
+import {Optional} from "typescript-optional"
 
 export class AsyncProcessService extends ProcessStatus {
 
@@ -33,10 +33,16 @@ export class AsyncProcessService extends ProcessStatus {
     }
 
     private setFetchOption<_InpTp>( requestInfo : RequestInfo, inputData : _InpTp) : RequestInit {
-        if( requestInfo.method == HTTP_METHOD.GET || inputData == undefined )
+        if( this.isBodyRequestMethod(requestInfo.method)  || inputData == undefined )
             return { method : requestInfo.method }
         else
             return { method : requestInfo.method, body : JSON.stringify(inputData) }
     }
 
+    private isBodyRequestMethod( httpRequest : HTTP_METHOD) : boolean {
+        if( httpRequest == HTTP_METHOD.GET || httpRequest == HTTP_METHOD.DELETE )
+            return false
+        else
+            return true
+    }
 }
