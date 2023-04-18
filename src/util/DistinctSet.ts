@@ -1,23 +1,33 @@
+import {Optional} from "typescript-optional";
 
-class DistinctSet<_Tp, _CheckTp> implements Set<_Tp>{
+export class DistinctSet<_Tp, _CheckTp> implements Iterable<_Tp>{
 
     container : Array<_Tp>
-    mapping : (_Tp) => _CheckTp
+    mapping : ( arg : _Tp) => _CheckTp
 
-    constructor( mapping : (_Tp) => _CheckTp, container : Array<_Tp> = Array<_Tp>() ) {
+    get size() : number { return this.container.length }
+    get length() : number { return this.container.length }
+
+    constructor( mapping : ( original : _Tp) => _CheckTp, container : Array<_Tp> = [] ) {
         this.mapping = mapping
         this.container = container
     }
 
-    readonly [Symbol.toStringTag]: string;
-    readonly size: number;
-
-    [Symbol.iterator](): IterableIterator<_Tp> {
+    [Symbol.iterator](): Iterator<_Tp> {
         return this.container[Symbol.iterator]();
     }
 
+    get( basis : _CheckTp) : Optional<_Tp> {
+        if(this.container && this.container.length > 0){
+            const result = this.container.find( item => this.isSameByStandard(item, basis))
+            if(result != undefined)
+                return Optional.of(result)
+        }
+        return Optional.empty();
+    }
+
     add(value: _Tp): this {
-        if( !this.has(value) ) {
+        if( this.container && !this.has(value) ) {
             this.container.push(value)
         }
         return this;
@@ -28,45 +38,56 @@ class DistinctSet<_Tp, _CheckTp> implements Set<_Tp>{
     }
 
     update(value: _Tp) : this {
-        if(this.delete(value)) {
+        if(this.delete(this.mapping(value))) {
             this.container.push(value)
         }
         return this;
     }
 
-    delete(value: _Tp): boolean {
-        const idx = this.container.findIndex( item => this.isSame(item, value) )
+
+    delete(base: _CheckTp): boolean {
+        const idx = this.container.findIndex( item => this.isSameByStandard(item, base) )
         if(idx >= 0) {
             this.container.splice(idx, 1)
             return true;
         }
         return false;
     }
-    entries(): IterableIterator<[_Tp, _Tp]> {
-        return this.container.entries();
-    }
-
-    forEach(callbackfn: (value: _Tp, value2: _Tp, set: Set<_Tp>) => void, thisArg?: any): void {
-        this.container.forEach( (data, index, set) => callbackfn(data, index, new Set(this.container)) )
-    }
+    //
+    // delete(value: _Tp): boolean {
+    //     const idx = this.container.findIndex( item => this.isSame(item, value) )
+    //     if(idx >= 0) {
+    //         this.container.splice(idx, 1)
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     has(value: _Tp): boolean {
-        if(this.container.find( item => this.isSame(item, value) ))
-            return true;
-        else
-            return false;
+        if(this.container && this.container.length > 0){
+            if(this.container.find( item => this.isSame(item, value) )) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    keys(): IterableIterator<_Tp> {
-        return this.container.keys();
+    hasStandard( standard : _CheckTp ) : boolean {
+        if(this.container && this.container.length > 0){
+            if(this.container.find( item => this.isSameByStandard(item, standard) )) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    values(): IterableIterator<_Tp> {
-        return this.container.values();
-    }
-
-
-    private isSame(lhs : _Tp, rhs : _Tp) {
+    private isSame(lhs : _Tp, rhs : _Tp): boolean {
         return JSON.stringify(this.mapping(lhs)) == JSON.stringify(this.mapping(rhs))
     }
+
+    private isSameByStandard(item : _Tp, base : _CheckTp) {
+        return JSON.stringify(this.mapping(item)) == JSON.stringify(base)
+    }
+
+
 }

@@ -4,7 +4,7 @@ import {Optional} from "typescript-optional"
 
 export class AsyncProcessService extends ProcessStatus {
 
-    async asyncProcessing<_ResTp, _InpTp>( requestInfo : RequestInfo, inputData : _InpTp = undefined) : Promise<Optional<_ResTp>> {
+    async asyncProcessing<_ResTp, _InpTp>( requestInfo : RequestInfo, inputData : _InpTp | undefined = undefined) : Promise<Optional<_ResTp>> {
         try {
             // processing이 진행중이면 false를 리턴한다.
             if(this.isPending())
@@ -24,15 +24,8 @@ export class AsyncProcessService extends ProcessStatus {
             return Optional.empty();
         }
     }
-    asyncInputProcessing<_InpTp, _ResTp>( requestInfo : RequestInfo, inputData : _InpTp = undefined) : Promise<_ResTp> {
-        return this.asyncProcessing(requestInfo, inputData)
-    }
 
-    asyncOutputProcessing<_InpTp, _ResTp>( requestInfo : RequestInfo, inputData : _InpTp = undefined, callback : (_ResTp) => void = () => {}) : Promise<_ResTp> {
-        return this.asyncProcessing(requestInfo, undefined)
-    }
-
-    private setFetchOption<_InpTp>( requestInfo : RequestInfo, inputData : _InpTp) : RequestInit {
+    private setFetchOption<_InpTp>( requestInfo : RequestInfo, inputData : _InpTp | undefined = undefined) : RequestInit {
         if( this.isBodyRequestMethod(requestInfo.method)  || inputData == undefined )
             return { method : requestInfo.method }
         else

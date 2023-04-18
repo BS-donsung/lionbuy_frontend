@@ -12,7 +12,3 @@ export async function crawlingByName() : Promise<Array<NameTag>> {
         {method: URI_OF_CRAWLING_REQUEST_BY_TAG.method}
     )).json()
 }
-
-export async function crawlingBy() {
-
-}
