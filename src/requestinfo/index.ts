@@ -15,7 +15,7 @@ export class RequestInfo {
         return new RequestInfo(HTTP_METHOD.GET, "")
     }
 
-    static of( method : HTTP_METHOD, uri : string ) {
+    static of( method : HTTP_METHOD, uri : string = "/") {
         return new RequestInfo(method, uri)
     }
 
@@ -24,6 +24,9 @@ export class RequestInfo {
         this.uri = uri
     }
 
+    setHostExplicitly( host : string ) {
+        return new RequestInfo(this.method, `${host}${this.uri}`)
+    }
     append( query : string ) : RequestInfo {
         return RequestInfo.of(this.method, `${this.uri}${query}`)
     }

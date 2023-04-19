@@ -1,5 +1,6 @@
 import {AsyncProcessService} from "../../src/abstract/AsyncProcessService";
 import {HTTP_METHOD, RequestInfo} from "../../src/requestinfo";
+import {ProcessStatus, STATUS} from "../../src/enums/ProcessStatus";
 
 
 export {}
@@ -22,5 +23,46 @@ describe("AsyncProcessService static method test", () => {
         const mockData = { test : "test"}
         expect(AsyncProcessService.setFetchOption(HTTP_REQUEST_GET, mockData)).toBe
     })
+})
+
+describe("AsyncProcessService pending service", () => {
+    // @ts-ignore
+    const host : string = global.HOST
+
+
+
+    const requestOfIndex = RequestInfo.of(HTTP_METHOD.GET).setHostExplicitly(host)
+
+    it("init test", () => {
+
+        expect(host).toBe("http://localhost:8888")
+    })
+
+    it("single success request", async () => {
+        // @ts-ignore
+        const host : string = global.HOST
+        const asyncProcessService = new AsyncProcessService()
+        expect(asyncProcessService.getProcessing()).toBe(STATUS.INIT)
+        const result = await asyncProcessService.asyncProcessing(requestOfIndex)
+        expect(result.isPresent()).toBeTruthy()
+        expect(asyncProcessService.getProcessing()).toBe(STATUS.SUCCESS)
+
+        return Promise.resolve()
+    })
+
+    it("multi success request", async () => {
+        // @ts-ignore
+        const host : string = global.HOST
+        // 시간 제한
+        const asyncProcessService = new AsyncProcessService()
+        expect(asyncProcessService.getProcessing()).toBe(STATUS.INIT)
+        for(let idx = 0; idx < 3; ++idx) {
+            const result = await asyncProcessService.asyncProcessing(requestOfIndex)
+            expect(result.isPresent()).toBeTruthy()
+            expect(asyncProcessService.getProcessing()).toBe(STATUS.SUCCESS)
+        }
+        return Promise.resolve()
+    })
+
 
 })

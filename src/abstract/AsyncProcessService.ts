@@ -13,13 +13,17 @@ export class AsyncProcessService extends ProcessStatus {
             this.setPending()
             // logic start
 
+            console.log("start")
             const response = await fetch(requestInfo.uri, AsyncProcessService.setFetchOption(requestInfo, inputData) )
+            console.log("middle")
             const result : _ResTp = await response.json()
+            console.log("end")
             // logic end
 
             this.setSuccess()
             return Optional.of(result)
         } catch (e) {
+            console.log(e)
             this.setFailure()
             return Optional.empty();
         }

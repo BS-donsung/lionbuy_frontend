@@ -8,4 +8,7 @@ module.exports = {
         "^.+\\.(ts|tsx)$": "ts-jest"
     },
     setupFilesAfterEnv: ['./jest.setup.cjs'],
+    globals : {
+        HOST : "http://localhost:8888"
+    }
 };
