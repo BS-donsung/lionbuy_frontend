@@ -20,11 +20,6 @@ describe("DistinctSet test", () => {
             expect(numSet.has(3)).toBeTruthy()
             expect(numSet.has(4)).toBeFalsy()
         })
-        it("[Symbol.iterator]()", () => {
-            for( const data of numSet) {
-                console.log(data);
-            }
-        })
 
         it("TEST update", () => {
             numSet.update(2)

@@ -1,6 +1,4 @@
 
-
-
 export class AuthDTO {
     principal : string
     credential : string
@@ -18,3 +16,5 @@ export class CreateUserDTO extends AuthDTO {
         this.username = username
     }
 }
+
+

@@ -13,7 +13,7 @@ export class AsyncProcessService extends ProcessStatus {
             this.setPending()
             // logic start
 
-            const response = await fetch(requestInfo.uri, this.setFetchOption(requestInfo, inputData) )
+            const response = await fetch(requestInfo.uri, AsyncProcessService.setFetchOption(requestInfo, inputData) )
             const result : _ResTp = await response.json()
             // logic end
 
@@ -25,14 +25,14 @@ export class AsyncProcessService extends ProcessStatus {
         }
     }
 
-    private setFetchOption<_InpTp>( requestInfo : RequestInfo, inputData : _InpTp | undefined = undefined) : RequestInit {
+    static setFetchOption<_InpTp>( requestInfo : RequestInfo, inputData : _InpTp | undefined = undefined) : RequestInit {
         if( this.isBodyRequestMethod(requestInfo.method)  || inputData == undefined )
             return { method : requestInfo.method }
         else
             return { method : requestInfo.method, body : JSON.stringify(inputData) }
     }
 
-    private isBodyRequestMethod( httpRequest : HTTP_METHOD) : boolean {
+    static isBodyRequestMethod( httpRequest : HTTP_METHOD) : boolean {
         if( httpRequest == HTTP_METHOD.GET || httpRequest == HTTP_METHOD.DELETE )
             return false
         else
