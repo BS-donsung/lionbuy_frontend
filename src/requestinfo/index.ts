@@ -8,8 +8,8 @@ export enum HTTP_METHOD {
     DELETE = "DELETE"
 }
 export class RequestInfo {
-    method : HTTP_METHOD
-    uri : string
+    readonly method : HTTP_METHOD
+    readonly uri : string
 
     static empty() {
         return new RequestInfo(HTTP_METHOD.GET, "")
@@ -22,5 +22,9 @@ export class RequestInfo {
     constructor(method : HTTP_METHOD , uri : string) {
         this.method = method;
         this.uri = uri
+    }
+
+    append( query : string ) : RequestInfo {
+        return RequestInfo.of(this.method, `${this.uri}${query}`)
     }
 }

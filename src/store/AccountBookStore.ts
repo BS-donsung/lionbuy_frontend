@@ -6,9 +6,8 @@ import {
     URI_OF_ACCOUNT_SELECT,
     URI_OF_ACCOUNT_UPDATE
 } from "../requestinfo/AccountBookServiceInfo";
-import {AsyncProcessService} from "../abstract/AsyncProcessService";
-import {RequestInfo} from "../requestinfo";
 import {CachedListContainer} from "../abstract/CachedListContainer";
+import {curringFiltering} from "../util/FilterFunction";
 
 interface AccountBookServiceInterface {
     selectByMonth( month : number, year : number ) : Array<PurchasedItemDTO>
@@ -22,27 +21,26 @@ interface AccountBookServiceInterface {
 // clear cache
 
 
-const useAccountBookService =
-    defineStore("accountbook", () => {
+const useAccountBookStore =
+    defineStore("AccountBookStore", () => {
 
         const distinctBase = (item : PurchasedItemDetailDTO ) => { return { "product" : item.product, "date" : item.dateOfPurchase } }
-        const cacheContainer = new CachedListContainer<PurchasedItemDetailDTO>(distinctBase)
+        type distinctFunc = typeof distinctBase
+        type StandardType = ReturnType<distinctFunc>
+        const cacheContainer = new CachedListContainer<PurchasedItemDetailDTO, StandardType, distinctFunc>(distinctBase)
         // Select 함수
         function selectItemListByMonth( month : number, year : number ) : Array<PurchasedItemDTO> {
-            return cacheContainer.getDataList().filter( item =>
-                (item.dateOfPurchase.getMonth() == month) && (item.dateOfPurchase.getUTCFullYear() == year)
-            )
+            return cacheContainer.getDataList().filter( curringFiltering(month, year) )
         }
 
         function selectPriceByMonth( month : number, year : number ) : number {
-            return cacheContainer.getDataList().filter( item =>
-                (item.dateOfPurchase.getMonth() == month) && (item.dateOfPurchase.getUTCFullYear() == year)
-            ).reduce( acc, curr => acc + curr, 0)
+            return cacheContainer.getDataList().filter( curringFiltering(month, year) ).reduce(
+                (acc, curr) => acc + curr.price, 0
+            )
         }
-
         // Async 함수
         async function updateList( month : number, year : number) {
-            return this.updateCache(`${URI_OF_ACCOUNT_SELECT}?month=${month}&&year=${year}`)
+            return cacheContainer.updateCache(URI_OF_ACCOUNT_SELECT.append(`?month=${month}&&year=${year}`))
         }
 
         async function addPurchasedItem( purchaseditem : PurchasedItemDetailDTO ) : Promise<boolean> {

@@ -8,20 +8,22 @@ import {
     URI_OF_WISH_UPDATE
 } from "../requestinfo/WishListServiceInfo";
 
-const useWishListService =
-    defineStore("wishlist", () => {
+const useWishListStore =
+    defineStore("WishListStore", () => {
         const distinctBase = (item : WishItemDTO ) => item.product
-        const cacheContainer = new CachedListContainer<WishItemDTO>(distinctBase)
+        type distinctFunc = typeof distinctBase
+        type StandardType = ReturnType<distinctFunc>
+        const cacheContainer = new CachedListContainer<WishItemDTO, StandardType, distinctFunc>(distinctBase)
 
         function selectWishList() : Array<WishItemDTO> {
             return cacheContainer.getDataList()
         }
         function selectWishListTotalPrice() : number {
-            return cacheContainer.getDataList().map( item => item.lowerprice ).reduce( acc, curr => acc + curr, 0)
+            return cacheContainer.getDataList().reduce( (acc, curr) => (acc + curr.lowerprice), 0)
         }
 
         async function updateCache( month : number, year : number ) : Promise<boolean> {
-            await cacheContainer.updateCache(URI_OF_WISH_SELECT)
+            return cacheContainer.updateCache(URI_OF_WISH_SELECT)
         }
 
         function addWishItem( wishItemDTO : WishItemDTO ) : Promise<boolean> {
@@ -38,6 +40,5 @@ const useWishListService =
             selectWishList, selectWishListTotalPrice,
             updateCache,
             addWishItem, updatePurchasedItem, deletePurchasedItem
-
         }
     })
